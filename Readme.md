@@ -21,5 +21,5 @@ RewriteRule ^ index.php [QSA,L]
 ```
 
 <h4>Como modificar</h4>
-<p>Dentro da pasta <i>src/routes/clients.php<i> estão todas as rotas para aplicação bem como as querys para o banco de dados<p>
-  <p>Dentro da pasta <i>src/config/db.php<i> estão as configuraçõesdo banco de dados<p>
+<p>Dentro da pasta <i>src/routes/clients.php</i> estão todas as rotas para aplicação bem como as querys para o banco de dados.<p>
+  <p>Dentro da pasta <i>src/config/db.php</i> estão as configuraçõesdo banco de dados.<p>
