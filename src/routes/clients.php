@@ -1,32 +1,51 @@
 <?php
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
-
+//use Slim\Http\Headers;
 
 $app = new \Slim\App;
+
+
+/*
+    Usando com a ultima linha do .htaccess agora sempre poderemos pegar
+    o valor de $_SERVER["HTTP_AUTHORIZATION"], que por valor padrão será
+    igual a ".
+*/
+
+
+//just for test
+$app->get('/api/login', function(Request $req, Response $res){
+    //return $res->write('{"name":"kevin"}');
+    //return $res->withHeader('total',50);
+    //return $res->withStatus(201)->write('{"name":"kevin"}');
+    if($_SERVER["HTTP_AUTHORIZATION"] != ''){
+        echo('{"success":"Request successful"}');
+    }else{
+        return $res->withStatus(401);
+    }
+   
+});
 
 
 //GET para pegar todos os dados
 $app->get('/api/nomes', function(Request $request,Response $response){
     $sql = "select * from nomes";
-    try {
-        $db = new db();
-        $db = $db->connectDB();
-        $resultado = $db->query($sql);
-
-        if($resultado->rowCount() > 0){
-            $usuarios = $resultado->fetchAll(PDO::FETCH_OBJ);
-            echo json_encode($usuarios);
-        }else{
+  
+    $db = new db();
+    $db = $db->connectDB();
+     $resultado = $db->query($sql);
+        
+    if($resultado->rowCount() > 0){
+       $usuarios = $resultado->fetchAll(PDO::FETCH_OBJ);
+        echo json_encode($usuarios);
+    }else{
             echo json_encode("Base da dados vazia");
+            header('Content-Type: application/json');
         }
         $resultado = null;
         $db = null;
-
-    } catch (PDOException $e){
-        echo('a');
-        echo ('{"error:": {"text":'.$e->getMessage().'}');
-    }
+    
+    return $response->withStatus(401);
 });
 
 //GET pelo id 
@@ -43,6 +62,7 @@ $app->get('/api/nomes/{id}', function(Request $request,Response $response){
             echo json_encode($usuarios);
         }else{
             echo json_encode("Base da dados vazia");
+            header('Content-Type: application/json');
         }
         $resultado = null;
         $db = null;
