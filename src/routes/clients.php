@@ -1,10 +1,8 @@
 <?php
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
-//use Slim\Http\Headers;
 
 $app = new \Slim\App;
-
 
 /*
     Usando com a ultima linha do .htaccess agora sempre poderemos pegar
@@ -20,6 +18,7 @@ $app->get('/api/login', function(Request $req, Response $res){
     //return $res->withStatus(201)->write('{"name":"kevin"}');
     if($_SERVER["HTTP_AUTHORIZATION"] != ''){
         echo('{"success":"Request successful"}');
+        //seu codigo aqui caso esteja autorizado.
     }else{
         return $res->withStatus(401);
     }
