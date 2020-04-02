@@ -2,6 +2,10 @@
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
 
+use CoffeeCode\DataLayer\Connect;
+
+require_once "../Models/User.php";
+
 $app = new \Slim\App;
 
 /*
@@ -11,136 +15,84 @@ $app = new \Slim\App;
 */
 
 
+$db = Connect::getInstance();
+$error = Connect::getError();
+
+
 //just for test
 $app->get('/api/login', function(Request $req, Response $res){
     //return $res->write('{"name":"kevin"}');
     //return $res->withHeader('total',50);
     //return $res->withStatus(201)->write('{"name":"kevin"}');
+    /*
     if($_SERVER["HTTP_AUTHORIZATION"] != ''){
         echo('{"success":"Request successful"}');
         //seu codigo aqui caso esteja autorizado.
     }else{
         return $res->withStatus(401);
     }
-   
+    */
 });
 
-
-//GET para pegar todos os dados
+//Retorna todos os usuários
 $app->get('/api/nomes', function(Request $request,Response $response){
-    $sql = "select * from nomes";
-  
-    $db = new db();
-    $db = $db->connectDB();
-     $resultado = $db->query($sql);
-        
-    if($resultado->rowCount() > 0){
-       $usuarios = $resultado->fetchAll(PDO::FETCH_OBJ);
-        echo json_encode($usuarios);
-    }else{
-            echo json_encode("Base da dados vazia");
-            header('Content-Type: application/json');
-        }
-        $resultado = null;
-        $db = null;
     
-    return $response->withStatus(401);
+    $user  = new User();
+
+    $list = $user->find()->fetch(true);
+    $data = array();
+    foreach ($list as $userItem){
+        $value = $userItem->data();
+        array_push($data,$value);
+    }
+
+    return $response->write(json_encode($data))->withHeader("Content-Type","application/json");
 });
 
-//GET pelo id 
+//Retorna um usuário específico pelo id 
 $app->get('/api/nomes/{id}', function(Request $request,Response $response){
     $id = $request->getAttribute('id');
-    $sql = "select * from nomes where id = $id";
-    try {
-        $db = new db();
-        $db = $db->connectDB();
-        $resultado = $db->query($sql);
 
-        if($resultado->rowCount() > 0){
-            $usuarios = $resultado->fetchAll(PDO::FETCH_OBJ);
-            echo json_encode($usuarios);
-        }else{
-            echo json_encode("Base da dados vazia");
-            header('Content-Type: application/json');
-        }
-        $resultado = null;
-        $db = null;
+    $data  = (new User())->findById($id)->data();
 
-    } catch (PDOException $e){
-        echo('a');
-        echo ('{"error:": {"text":'.$e->getMessage().'}');
-    }
+    return $response->write(json_encode($data))->withHeader("Content-Type","application/json");
 });
 
-//POST criar novo usuario
+//Criar novo usuário
 $app->post('/api/nomes/novo', function(Request $request,Response $response){
     $nome = $request->getParam('nome');
-    //$nome = $request->getParam('nome');
-    //$nome = $request->getParam('nome');
-    //$nome = $request->getParam('nome');
-    //$nome = $request->getParam('nome');
-    
-    $sql = "INSERT INTO nomes(nome) values(:nome)"; // coloca o ':' antes da variavel
-    try {
-        $db = new db();
-        $db = $db->connectDB();
-        $resultado = $db->prepare($sql); //prepara a query
 
+    $user  = new User();
+    $user->nome = $nome;
+    $user->save();
 
-        $resultado->bindParam(':nome',$nome);
-        //$resultado->bindParam(':nome',$nome);
-        //$resultado->bindParam(':nome',$nome);
-        //$resultado->bindParam(':nome',$nome);
-        //$resultado->bindParam(':nome',$nome);
+    $id = $user->id;
+    $strId = "{\"id\":\"$id\"}";
 
-        $resultado->execute(); // execuçã oda query
-        echo json_encode("Novo usuário adicionado.");
-
-
-        $resultado = null;
-        $db = null;
-
-    } catch (PDOException $e){
-        echo('a');
-        echo ('{"error:": {"text":'.$e->getMessage().'}');
-    }
+    return $response->write($strId)->withStatus(201);
 });
 
-//PUT modificar usuario
+//Modificar um usuário
 $app->post('/api/nomes/{id}', function(Request $request,Response $response){
     $id = $request->getAttribute('id');
     $nome = $request->getParam('nome');
-    //$nome = $request->getParam('nome');
-    //$nome = $request->getParam('nome');
-    //$nome = $request->getParam('nome');
-    //$nome = $request->getParam('nome');
-    
-    $sql = "UPDATE nomes SET 
-            nome = :nome 
-            WHERE id = $id"; // coloca o ':' antes da variavel
-    try {
-        $db = new db();
-        $db = $db->connectDB();
-        $resultado = $db->prepare($sql); //prepara a query
 
+    $user  = (new User())->findById($id);
+    $user->nome = $nome;
+    $user->save();
 
-        $resultado->bindParam(':nome',$nome);
-        //$resultado->bindParam(':nome',$nome);
-        //$resultado->bindParam(':nome',$nome);
-        //$resultado->bindParam(':nome',$nome);
-        //$resultado->bindParam(':nome',$nome);
-
-        $resultado->execute(); // execuçã oda query
-        echo json_encode("Dados do usuário modificado.");
-
-
-        $resultado = null;
-        $db = null;
-
-    } catch (PDOException $e){
-        echo('a');
-        echo ('{"error:": {"text":'.$e->getMessage().'}');
-    }
+    $response->write(json_encode($user->data()))->withStatus(201);
 });
 
+$app->get("/api/nomes/deletar/{id}",function(Request $request,Response $response){
+    $id = $request->getAttribute('id');
 
+    $user  = (new User())->findById($id);
+
+    $id = $user->id;
+    $strId = "{\"id\":\"$id\"}";
+
+    $user->destroy();
+
+    return $response->write($strId)->withStatus(201);
+});

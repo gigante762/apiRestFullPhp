@@ -10,8 +10,12 @@ use CoffeeCode\DataLayer\Connect;
 $conn = Connect::getInstance();
 $error = Connect::getError();
 
+$id = "10";
+echo("{\"id\":\"$id\"}");
+
+
 //$user  = new User();
-echo('<pre>');
+//echo('<pre>');
 /*
 $list = $user->find()->fetch(true);
 
