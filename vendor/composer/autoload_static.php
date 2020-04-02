@@ -24,6 +24,10 @@ class ComposerStaticInit3229aa6388b58c9e14df8778d738b8e1
         array (
             'FastRoute\\' => 10,
         ),
+        'C' => 
+        array (
+            'CoffeeCode\\DataLayer\\' => 21,
+        ),
     );
 
     public static $prefixDirsPsr4 = array (
@@ -42,6 +46,10 @@ class ComposerStaticInit3229aa6388b58c9e14df8778d738b8e1
         'FastRoute\\' => 
         array (
             0 => __DIR__ . '/..' . '/nikic/fast-route/src',
+        ),
+        'CoffeeCode\\DataLayer\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/coffeecode/datalayer/src',
         ),
     );
 
